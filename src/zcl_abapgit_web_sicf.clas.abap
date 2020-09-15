@@ -17,7 +17,6 @@ CLASS ZCL_ABAPGIT_WEB_SICF IMPLEMENTATION.
 
   METHOD if_http_extension~handle_request.
 
-    
 
     DATA(lv_path) = cl_http_utility=>if_http_utility~unescape_url( server->request->get_header_field( '~path' ) ).
 
