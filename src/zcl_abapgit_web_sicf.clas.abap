@@ -17,7 +17,7 @@ CLASS ZCL_ABAPGIT_WEB_SICF IMPLEMENTATION.
 
   METHOD if_http_extension~handle_request.
 
-    DATA ls_asset TYPE zif_abapgit_gui_asset_manager=>ty_web_asset.
+    
 
     DATA(lv_path) = cl_http_utility=>if_http_utility~unescape_url( server->request->get_header_field( '~path' ) ).
 
