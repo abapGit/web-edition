@@ -12,7 +12,8 @@ CLASS zcl_abapgit_html_viewer_web DEFINITION
         !ii_server TYPE REF TO if_http_server .
   PROTECTED SECTION.
   PRIVATE SECTION.
-
+    DATA mv_html TYPE string.
+    DATA mv_css TYPE string.
     DATA mi_server TYPE REF TO if_http_server .
 ENDCLASS.
 
@@ -44,19 +45,10 @@ CLASS ZCL_ABAPGIT_HTML_VIEWER_WEB IMPLEMENTATION.
 
   METHOD zif_abapgit_html_viewer~load_data.
 
-    DATA: lv_xstr TYPE xstring.
-    FIELD-SYMBOLS: <lv_mime> TYPE w3_mime.
-
-    DATA(lv_path) = cl_http_utility=>if_http_utility~unescape_url( mi_server->request->get_header_field( '~path' ) ).
-
-    IF iv_url = 'css/bundle.css' AND lv_path = '/sap/zabapgit/css/bundle.css'.
-      mi_server->response->set_content_type( 'text/css' ).
-      mi_server->response->set_cdata( concat_lines_of( ct_data_table ) ).
-    ENDIF.
-
-    IF lv_path = '/sap/zabapgit/' AND iv_subtype = 'html'.
-      mi_server->response->set_content_type( 'text/html' ).
-      mi_server->response->set_cdata( concat_lines_of( ct_data_table ) ).
+    IF iv_url = 'css/bundle.css'.
+      mv_css = concat_lines_of( ct_data_table ).
+    ELSEIF iv_url = ''.
+      mv_html = concat_lines_of( ct_data_table ).
     ENDIF.
 
   ENDMETHOD.
@@ -71,7 +63,15 @@ CLASS ZCL_ABAPGIT_HTML_VIEWER_WEB IMPLEMENTATION.
 
   METHOD zif_abapgit_html_viewer~show_url.
 
-    RETURN.
+    DATA(lv_path) = cl_http_utility=>if_http_utility~unescape_url( mi_server->request->get_header_field( '~path' ) ).
+
+    IF lv_path = '/sap/zabapgit/css/bundle.css'.
+      mi_server->response->set_content_type( 'text/css' ).
+      mi_server->response->set_cdata( mv_css ).
+    ELSEIF lv_path = '/sap/zabapgit/'.
+      mi_server->response->set_content_type( 'text/html' ).
+      mi_server->response->set_cdata( mv_html ).
+    ENDIF.
 
   ENDMETHOD.
 ENDCLASS.
