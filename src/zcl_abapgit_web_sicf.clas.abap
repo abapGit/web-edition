@@ -96,7 +96,25 @@ CLASS ZCL_ABAPGIT_WEB_SICF IMPLEMENTATION.
   METHOD sapevent.
 
 * todo, parse and pass data
-    mo_viewer->raise_event( ).
+* todo, respect GET and POST
+
+    DATA: lt_fields  TYPE tihttpnvp,
+          lv_action  TYPE c LENGTH 100,
+          lv_getdata TYPE c LENGTH 100,
+          ls_field   LIKE LINE OF lt_fields.
+
+    ii_server->request->get_header_fields( CHANGING fields = lt_fields ).
+
+    READ TABLE lt_fields WITH KEY name = '~request_uri' INTO ls_field.
+    REPLACE FIRST OCCURRENCE OF gc_base IN ls_field-value WITH ''.
+
+    FIND REGEX '^sapevent:(\w+)' IN ls_field-value SUBMATCHES lv_action.
+
+    FIND REGEX '\?(\w+)' IN ls_field-value SUBMATCHES lv_getdata.
+
+    mo_viewer->raise_event(
+      iv_action  = lv_action
+      iv_getdata = lv_getdata ).
 
   ENDMETHOD.
 

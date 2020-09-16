@@ -7,7 +7,10 @@ CLASS zcl_abapgit_html_viewer_web DEFINITION
 
     INTERFACES zif_abapgit_html_viewer .
 
-    METHODS raise_event .
+    METHODS raise_event
+      IMPORTING
+        iv_action TYPE clike
+        iv_getdata TYPE clike.
     METHODS constructor
       IMPORTING
         !ii_server TYPE REF TO if_http_server .
@@ -36,8 +39,8 @@ CLASS ZCL_ABAPGIT_HTML_VIEWER_WEB IMPLEMENTATION.
 
     RAISE EVENT zif_abapgit_html_viewer~sapevent
       EXPORTING
-        action      = 'repo_newonline'
-        getdata     = ''
+        action      = iv_action
+        getdata     = iv_getdata
         postdata    = VALUE #( )
         query_table = VALUE #( ).
 
