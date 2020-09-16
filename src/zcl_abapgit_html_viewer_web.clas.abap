@@ -49,14 +49,14 @@ CLASS ZCL_ABAPGIT_HTML_VIEWER_WEB IMPLEMENTATION.
 
     DATA(lv_path) = cl_http_utility=>if_http_utility~unescape_url( mi_server->request->get_header_field( '~path' ) ).
 
-    IF url = 'css/bundle.css' AND lv_path = '/sap/zabapgit/css/bundle.css'.
+    IF iv_url = 'css/bundle.css' AND lv_path = '/sap/zabapgit/css/bundle.css'.
       mi_server->response->set_content_type( 'text/css' ).
-      mi_server->response->set_cdata( concat_lines_of( data_table ) ).
+      mi_server->response->set_cdata( concat_lines_of( ct_data_table ) ).
     ENDIF.
 
-    IF lv_path = '/sap/zabapgit/' AND subtype = 'html'.
+    IF lv_path = '/sap/zabapgit/' AND iv_subtype = 'html'.
       mi_server->response->set_content_type( 'text/html' ).
-      mi_server->response->set_cdata( concat_lines_of( data_table ) ).
+      mi_server->response->set_cdata( concat_lines_of( ct_data_table ) ).
     ENDIF.
 
   ENDMETHOD.
