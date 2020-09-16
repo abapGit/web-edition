@@ -7,6 +7,7 @@ CLASS zcl_abapgit_html_viewer_web DEFINITION
 
     INTERFACES zif_abapgit_html_viewer .
 
+    METHODS raise_event .
     METHODS constructor
       IMPORTING
         !ii_server TYPE REF TO if_http_server .
@@ -25,6 +26,20 @@ CLASS ZCL_ABAPGIT_HTML_VIEWER_WEB IMPLEMENTATION.
   METHOD constructor.
 
     mi_server = ii_server.
+
+  ENDMETHOD.
+
+
+  METHOD raise_event.
+
+* todo, all parameters as input
+
+    RAISE EVENT zif_abapgit_html_viewer~sapevent
+      EXPORTING
+        action      = 'repo_newonline'
+        getdata     = ''
+        postdata    = VALUE #( )
+        query_table = VALUE #( ).
 
   ENDMETHOD.
 
@@ -80,7 +95,7 @@ CLASS ZCL_ABAPGIT_HTML_VIEWER_WEB IMPLEMENTATION.
     IF lv_path = '/sap/zabapgit/css/bundle.css'.
       mi_server->response->set_content_type( 'text/css' ).
       mi_server->response->set_cdata( mv_css ).
-    ELSEIF lv_path = '/sap/zabapgit/'.
+    ELSEIF lv_path = '/sap/zabapgit/' OR lv_path CP |/sap/zabapgit/sapevent:+*|.
       REPLACE FIRST OCCURRENCE OF |</body>| IN mv_html WITH js.
       mi_server->response->set_content_type( 'text/html' ).
       mi_server->response->set_cdata( mv_html ).

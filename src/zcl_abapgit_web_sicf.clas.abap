@@ -8,8 +8,16 @@ CLASS zcl_abapgit_web_sicf DEFINITION
     INTERFACES if_http_extension .
   PROTECTED SECTION.
 
+    DATA mo_viewer TYPE REF TO zcl_abapgit_html_viewer_web .
     CONSTANTS gc_base TYPE string VALUE '/sap/zabapgit/' ##NO_TEXT.
+    DATA mo_gui TYPE REF TO zcl_abapgit_gui .
 
+    METHODS initialize
+      IMPORTING
+        !ii_server TYPE REF TO if_http_server .
+    METHODS sapevent
+      IMPORTING
+        !ii_server TYPE REF TO if_http_server .
     METHODS redirect
       IMPORTING
         !ii_server TYPE REF TO if_http_server .
@@ -17,7 +25,7 @@ CLASS zcl_abapgit_web_sicf DEFINITION
       IMPORTING
         !ii_server      TYPE REF TO if_http_server
       RETURNING
-        VALUE(rv_found) TYPE abap_bool.
+        VALUE(rv_found) TYPE abap_bool .
   PRIVATE SECTION.
 ENDCLASS.
 
@@ -28,19 +36,38 @@ CLASS ZCL_ABAPGIT_WEB_SICF IMPLEMENTATION.
 
   METHOD if_http_extension~handle_request.
 
+    server->set_session_stateful( ).
+
+    IF mo_viewer IS INITIAL.
+      initialize( server ).
+    ENDIF.
+
     DATA(lv_found) = search_asset( server ).
     IF lv_found = abap_true.
       RETURN.
     ENDIF.
 
     DATA(lv_path) = cl_http_utility=>if_http_utility~unescape_url( server->request->get_header_field( '~path' ) ).
-    CASE lv_path.
-      WHEN '/sap/zabapgit'.
-        redirect( server ).
-      WHEN '/sap/zabapgit/' OR '/sap/zabapgit/css/bundle.css'.
-        zcl_abapgit_ui_injector=>set_html_viewer( NEW zcl_abapgit_html_viewer_web( server ) ).
-        zcl_abapgit_ui_factory=>get_gui( )->go_home( ).
-    ENDCASE.
+    IF lv_path = '/sap/zabapgit'.
+      redirect( server ).
+    ELSEIF lv_path = gc_base.
+      mo_gui->go_home( ).
+    ELSEIF lv_path = |{ gc_base }css/bundle.css|.
+      mo_viewer->zif_abapgit_html_viewer~show_url( |css/bundle.css| ).
+    ELSEIF lv_path CP |{ gc_base }sapevent:+*|.
+      sapevent( server ).
+    ENDIF.
+
+  ENDMETHOD.
+
+
+  METHOD initialize.
+
+    mo_viewer = NEW zcl_abapgit_html_viewer_web( ii_server ).
+
+    zcl_abapgit_ui_injector=>set_html_viewer( mo_viewer ).
+
+    mo_gui = zcl_abapgit_ui_factory=>get_gui( ).
 
   ENDMETHOD.
 
@@ -62,6 +89,14 @@ CLASS ZCL_ABAPGIT_WEB_SICF IMPLEMENTATION.
       |</html>|.
 
     ii_server->response->set_cdata( lv_html ).
+
+  ENDMETHOD.
+
+
+  METHOD sapevent.
+
+* todo, parse and pass data
+    mo_viewer->raise_event( ).
 
   ENDMETHOD.
 
