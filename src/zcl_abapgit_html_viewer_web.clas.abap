@@ -83,23 +83,23 @@ CLASS ZCL_ABAPGIT_HTML_VIEWER_WEB IMPLEMENTATION.
 
     DATA(lv_path) = cl_http_utility=>if_http_utility~unescape_url( mi_server->request->get_header_field( '~path' ) ).
 
-    DATA(js) = |<script>                                  | &&
-    |  function registerLinks() \{                        | &&
-    |    const links = document.getElementsByTagName("a");| &&
-    |    for (let i = 0; i < links.length; i++) \{        | &&
-    |      if (links[i].href.startsWith("sapevent:")) \{  | &&
-    |        links[i].href = "./" + links[i].href;        | &&
-    |      \}        | &&
-    |    \}          | &&
-    |  \}            | &&
-    |registerLinks();| &&
-    |</script></body>|.
+    DATA(lv_js) = |<script>                                 | &&
+      |  function registerLinks() \{                        | &&
+      |    const links = document.getElementsByTagName("a");| &&
+      |    for (let i = 0; i < links.length; i++) \{        | &&
+      |      if (links[i].href.startsWith("sapevent:")) \{  | &&
+      |        links[i].href = "./" + links[i].href;        | &&
+      |      \}        | &&
+      |    \}          | &&
+      |  \}            | &&
+      |registerLinks();| &&
+      |</script></body>|.
 
     IF lv_path = '/sap/zabapgit/css/bundle.css'.
       mi_server->response->set_content_type( 'text/css' ).
       mi_server->response->set_cdata( mv_css ).
     ELSEIF lv_path = '/sap/zabapgit/' OR lv_path CP |/sap/zabapgit/sapevent:+*|.
-      REPLACE FIRST OCCURRENCE OF |</body>| IN mv_html WITH js.
+      REPLACE FIRST OCCURRENCE OF |</body>| IN mv_html WITH lv_js.
       mi_server->response->set_content_type( 'text/html' ).
       mi_server->response->set_cdata( mv_html ).
     ENDIF.
