@@ -110,7 +110,7 @@ CLASS ZCL_ABAPGIT_WEB_SICF IMPLEMENTATION.
 
     FIND REGEX '^sapevent:(\w+)' IN ls_field-value SUBMATCHES lv_action.
 
-    FIND REGEX '\?(\w+)' IN ls_field-value SUBMATCHES lv_getdata.
+    FIND REGEX '\?([\w=&]+)' IN ls_field-value SUBMATCHES lv_getdata.
 
     mo_viewer->raise_event(
       iv_action  = lv_action
