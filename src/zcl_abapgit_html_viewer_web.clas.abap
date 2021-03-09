@@ -64,9 +64,9 @@ CLASS ZCL_ABAPGIT_HTML_VIEWER_WEB IMPLEMENTATION.
   METHOD zif_abapgit_html_viewer~load_data.
 
     IF iv_url = 'css/bundle.css'.
-      mv_css = concat_lines_of( ct_data_table ).
+      CONCATENATE LINES OF ct_data_table INTO mv_css IN CHARACTER MODE RESPECTING BLANKS.
     ELSEIF iv_url = ''.
-      mv_html = concat_lines_of( ct_data_table ).
+      CONCATENATE LINES OF ct_data_table INTO mv_html IN CHARACTER MODE RESPECTING BLANKS.
     ENDIF.
 
   ENDMETHOD.
