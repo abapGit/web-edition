@@ -47,6 +47,11 @@ CLASS ZCL_ABAPGIT_HTML_VIEWER_WEB IMPLEMENTATION.
   ENDMETHOD.
 
 
+  METHOD zif_abapgit_html_viewer~back.
+    RETURN.
+  ENDMETHOD.
+
+
   METHOD zif_abapgit_html_viewer~close_document.
 
     RETURN.
@@ -58,6 +63,11 @@ CLASS ZCL_ABAPGIT_HTML_VIEWER_WEB IMPLEMENTATION.
 
     RETURN.
 
+  ENDMETHOD.
+
+
+  METHOD zif_abapgit_html_viewer~get_url.
+    RETURN.
   ENDMETHOD.
 
 
@@ -79,21 +89,39 @@ CLASS ZCL_ABAPGIT_HTML_VIEWER_WEB IMPLEMENTATION.
   ENDMETHOD.
 
 
+  METHOD zif_abapgit_html_viewer~set_visiblity.
+    RETURN.
+  ENDMETHOD.
+
+
   METHOD zif_abapgit_html_viewer~show_url.
 
     DATA(lv_path) = cl_http_utility=>if_http_utility~unescape_url( mi_server->request->get_header_field( '~path' ) ).
 
-    DATA(lv_js) = |<script>                                 | &&
-      |  function registerLinks() \{                        | &&
-      |    const links = document.getElementsByTagName("a");| &&
-      |    for (let i = 0; i < links.length; i++) \{        | &&
-      |      if (links[i].href.startsWith("sapevent:")) \{  | &&
-      |        links[i].href = "./" + links[i].href;        | &&
-      |      \}        | &&
-      |    \}          | &&
-      |  \}            | &&
-      |registerLinks();| &&
-      |</script></body>|.
+    DATA(lv_js) = |<script>                               \n| &&
+      |function registerLinks() \{                        \n| &&
+      |  const links = document.getElementsByTagName("a");\n| &&
+      |  for (let i = 0; i < links.length; i++) \{        \n| &&
+      |    if (links[i].href.startsWith("sapevent:")) \{  \n| &&
+      |      links[i].href = "./" + links[i].href;        \n| &&
+      |    \}          \n| &&
+      |  \}            \n| &&
+      |\}              \n| &&
+      |registerLinks();\n| &&
+      |function processForm(e) \{ \n| &&
+      |  if (e.preventDefault) e.preventDefault(); \n| &&
+      |  console.dir(e);\n| &&
+      |  return false;  \n| &&
+      |\}               \n| &&
+      |function registerForms() \{                           \n| &&
+      |  const forms = document.getElementsByTagName("form");\n| &&
+      |  for (let i = 0; i < forms.length; i++) \{           \n| &&
+      |    forms[i].addEventListener("submit", processForm); \n| &&
+      |    console.dir(forms[i]);\n| &&
+      |  \}            \n| &&
+      |\}              \n| &&
+      |registerForms();\n| &&
+      |</script></body>\n|.
 
     IF lv_path = '/sap/zabapgit/css/bundle.css'.
       mi_server->response->set_content_type( 'text/css' ).
