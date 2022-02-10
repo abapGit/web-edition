@@ -71,6 +71,11 @@ CLASS ZCL_ABAPGIT_HTML_VIEWER_WEB IMPLEMENTATION.
   ENDMETHOD.
 
 
+  METHOD zif_abapgit_html_viewer~get_viewer.
+    RETURN.
+  ENDMETHOD.
+
+
   METHOD zif_abapgit_html_viewer~load_data.
 
     IF iv_url = 'css/bundle.css'.
